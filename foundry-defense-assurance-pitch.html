@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Foundry Defense Assurance - Two-page concept pitch</title>
+  <style>
+    @page { size: A4; margin: 12mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #e8edf3; color: #17283d; font-family: "Segoe UI", Arial, sans-serif; font-size: 10pt; line-height: 1.38; }
+    .page { position: relative; width: 186mm; height: 273mm; margin: 24px auto; padding: 0 0 12mm; background: white; }
+    .eyebrow { color: #076e79; font-weight: 700; font-size: 8pt; letter-spacing: 1.5px; text-transform: uppercase; padding-top: 4mm; }
+    h1 { font-size: 29pt; line-height: 1.08; margin: 9px 0; letter-spacing: -1px; }
+    .tagline { color: #076e79; font-size: 15pt; font-weight: 600; margin: 0 0 12px; }
+    h2 { font-size: 12.5pt; margin: 15px 0 6px; color: #133c68; }
+    h3 { font-size: 10.5pt; margin: 0 0 4px; }
+    p { margin: 6px 0; }
+    .lead { font-size: 10.8pt; }
+    .callout { border-left: 4px solid #008b8b; background: #edf7f7; padding: 9px 12px; margin: 10px 0; }
+    .small { font-size: 8.3pt; color: #48586c; }
+    table { border-collapse: collapse; width: 100%; font-size: 9pt; }
+    th { background: #173859; color: white; text-align: left; padding: 6px 8px; font-weight: 600; }
+    td { border-bottom: 1px solid #dce4ed; padding: 6px 8px; vertical-align: top; }
+    tbody tr:nth-child(even) { background: #f4f7fa; }
+    .dimensions td:first-child { width: 25%; font-weight: 650; }
+    figure { margin: 7px 0 0; }
+    svg { width: 100%; height: auto; display: block; }
+    figcaption { font-size: 8pt; color: #48586c; margin-top: 4px; }
+    .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+    .card { background: #f4f7fa; border-top: 3px solid #1c648e; padding: 10px 12px; }
+    ol { margin: 5px 0; padding-left: 20px; }
+    li { margin: 6px 0; padding-left: 2px; }
+    .flow { font-weight: 650; font-size: 9.5pt; color: #076e79; background: #edf7f7; padding: 8px 10px; }
+    .example { border: 1px solid #cbd9e7; padding: 9px 12px; margin: 9px 0; }
+    .verdicts { font-size: 8.5pt; font-weight: 650; margin: 8px 0; }
+    .sources { border-top: 1px solid #dce4ed; padding-top: 7px; font-size: 7.4pt; color: #48586c; margin-top: 12px; }
+    a { color: #155f8e; text-decoration: none; }
+    footer { position: absolute; bottom: 3mm; left: 0; right: 0; border-top: 1px solid #dce4ed; padding-top: 6px; font-size: 8pt; color: #617084; display: flex; justify-content: space-between; }
+    @media screen { .page { padding-left: 18px; padding-right: 18px; box-shadow: 0 4px 22px #18304b22; } footer { left: 18px; right: 18px; } }
+    @media print { body { background: white; print-color-adjust: exact; -webkit-print-color-adjust: exact; } .page { margin: 0; break-after: page; } .page:last-child { break-after: auto; } }
+  </style>
+</head>
+<body>
+  <section class="page" aria-label="Page 1: Value proposition and architecture">
+    <div class="eyebrow">Product concept / September 16, 2026</div>
+    <h1>Foundry Defense Assurance</h1>
+    <p class="tagline">Test the attack. Prove the infrastructure holds.</p>
+    <p class="lead">Full kill-chain simulation for Foundry agents, with correlated evidence that the
+      surrounding governance controls stop unauthorized impact - even when the agent attempts an unsafe action.</p>
+
+    <h2>The problem: a refusal is not proof of protection</h2>
+    <p>An unsuccessful attack can mean the model refused, an infrastructure control blocked it, or the
+      evidence is missing. Our proposed platform distinguishes these outcomes, helping security leaders,
+      platform admins, and agent developers establish which protections actually cover their deployment.</p>
+    <div class="callout"><strong>The promise:</strong> demonstrate independent enforcement across five defense
+      dimensions, reconstruct the attack chain, and deliver an actionable evidence pack. This is infrastructure
+      assurance powered by attack simulation, not another model-quality benchmark.</div>
+
+    <h2>Five defense dimensions</h2>
+    <table class="dimensions">
+      <thead><tr><th>Dimension</th><th>What the customer needs to demonstrate</th></tr></thead>
+      <tbody>
+        <tr><td>Network isolation</td><td>Agent and dependency paths respect approved network boundaries; unintended public and cross-environment paths are rejected.</td></tr>
+        <tr><td>Gateway protection</td><td>Relevant traffic traverses APIM; configured request and token limits hold, and alternate routes do not bypass them.</td></tr>
+        <tr><td>Safety guardrails</td><td>Required content-safety policies are attached to tested paths and explicitly block prohibited content scenarios.</td></tr>
+        <tr><td>Ingress / egress</td><td>Only approved callers reach the agent, and agent-initiated connections reach only approved destinations.</td></tr>
+        <tr><td>Access control</td><td>Privileged operations require the correct identity, scoped permissions, and any required human approval.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Proposed architecture: attack, enforce, observe</h2>
+    <figure>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 316" role="img" aria-labelledby="diagram-title diagram-desc">
+        <title id="diagram-title">Protected Foundry agent and independent attack and evidence plane</title>
+        <desc id="diagram-desc">An authorized attack runner reaches a protected agent through ingress and APIM.
+          The agent uses a governed model route and scoped tools. Egress is restricted. Dashed telemetry flows
+          connect the runner and protected deployment to signal collectors, Sentinel, and the evidence engine.</desc>
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#375976"/></marker>
+          <marker id="signal-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#07847c"/></marker>
+        </defs>
+        <g font-family="Segoe UI, Arial, sans-serif">
+          <rect x="3" y="5" width="144" height="175" rx="8" fill="#fff3e8" stroke="#d59455"/>
+          <text x="15" y="26" font-size="11" font-weight="700" fill="#8d4b18">ATTACK SETUP</text>
+          <text x="15" y="48" font-size="11" fill="#17283d">Campaign orchestrator</text>
+          <text x="15" y="65" font-size="10" fill="#48586c">Allowed / denied probes</text>
+          <text x="15" y="81" font-size="10" fill="#48586c">Multi-turn test inputs</text>
+          <text x="15" y="97" font-size="10" fill="#48586c">Synthetic RAG content*</text>
+          <text x="15" y="113" font-size="10" fill="#48586c">Run IDs + hard limits</text>
+          <line x1="15" y1="125" x2="135" y2="125" stroke="#dfbc99"/>
+          <text x="15" y="142" font-size="10" fill="#48586c">Controlled destination</text>
+          <text x="15" y="157" font-size="10" fill="#48586c">+ backend assertions</text>
+          <text x="15" y="171" font-size="9" fill="#48586c">*Approved fixture setup</text>
+
+          <rect x="163" y="5" width="553" height="175" rx="8" fill="#f0f5fb" stroke="#799cbf"/>
+          <text x="175" y="25" font-size="11" font-weight="700" fill="#173859">PROTECTED DEPLOYMENT / LOGICAL CONTROL BOUNDARY</text>
+          <text x="175" y="42" font-size="10" fill="#48586c">Network isolation + private access where supported [2]</text>
+          <rect x="175" y="60" width="103" height="59" rx="5" fill="#fff" stroke="#799cbf"/>
+          <text x="226" y="82" text-anchor="middle" font-size="11" font-weight="600" fill="#173859">Ingress / APIM</text>
+          <text x="226" y="101" text-anchor="middle" font-size="9" fill="#48586c">Auth + request limits</text>
+          <rect x="300" y="60" width="104" height="59" rx="5" fill="#173859"/>
+          <text x="352" y="84" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">Foundry agent</text>
+          <text x="352" y="103" text-anchor="middle" font-size="9" fill="#e1edf7">Scoped identity</text>
+          <rect x="431" y="50" width="269" height="41" rx="5" fill="#fff" stroke="#799cbf"/>
+          <text x="442" y="67" font-size="10" font-weight="600" fill="#173859">APIM model route + token limits [1]</text>
+          <text x="442" y="82" font-size="10" fill="#48586c">Model + configured safety guardrails [4]</text>
+          <rect x="431" y="101" width="269" height="41" rx="5" fill="#fff" stroke="#799cbf"/>
+          <text x="442" y="117" font-size="10" font-weight="600" fill="#173859">Tool / data APIs: backend authorization</text>
+          <text x="442" y="132" font-size="10" fill="#48586c">Entra identity, scoped rights, test records</text>
+          <g fill="none" stroke="#375976" stroke-width="1.6" marker-end="url(#arrow)">
+            <path d="M147 88 H175"/><path d="M278 88 H300"/>
+            <path d="M404 77 H419 V70 H431"/><path d="M404 103 H419 V121 H431"/>
+          </g>
+          <text x="175" y="161" font-size="10" fill="#173859">Egress firewall / destination restrictions surround applicable outbound paths</text>
+
+          <g fill="none" stroke="#07847c" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#signal-arrow)">
+            <path d="M76 180 V211"/><path d="M351 180 V196 H180 V211"/>
+            <path d="M565 180 V196 H214 V211"/>
+          </g>
+          <text x="266" y="202" font-size="9" fill="#07847c">Dashed: evidence collection, not enforcement</text>
+          <rect x="3" y="213" width="251" height="93" rx="6" fill="#edf7f7" stroke="#66aaa4"/>
+          <text x="15" y="230" font-size="11" font-weight="700" fill="#076e79">SIGNAL CAPTURE [3, 5, 6]</text>
+          <text x="15" y="248" font-size="10" fill="#17283d">Foundry traces / Application Insights</text>
+          <text x="15" y="264" font-size="10" fill="#17283d">APIM, network + resource diagnostics</text>
+          <text x="15" y="280" font-size="10" fill="#17283d">Config snapshots / Azure Activity Log</text>
+          <text x="15" y="296" font-size="10" fill="#17283d">Backend outcomes / test-destination receipts</text>
+          <rect x="280" y="213" width="169" height="40" rx="6" fill="#edf7f7" stroke="#66aaa4"/>
+          <text x="364" y="230" text-anchor="middle" font-size="11" font-weight="600" fill="#076e79">Log Analytics</text>
+          <text x="364" y="244" text-anchor="middle" font-size="9" fill="#48586c">Configured / supported ingestion</text>
+          <rect x="280" y="266" width="169" height="40" rx="6" fill="#edf7f7" stroke="#66aaa4"/>
+          <text x="364" y="282" text-anchor="middle" font-size="11" font-weight="600" fill="#076e79">Sentinel</text>
+          <text x="364" y="297" text-anchor="middle" font-size="9" fill="#48586c">Expected alerts + incidents [5]</text>
+          <rect x="483" y="213" width="233" height="93" rx="6" fill="#173859"/>
+          <text x="496" y="234" font-size="11" font-weight="700" fill="#fff">OUR EVIDENCE ENGINE</text>
+          <text x="496" y="254" font-size="10" fill="#e1edf7">Correlate IDs + independent outcomes</text>
+          <text x="496" y="270" font-size="10" fill="#e1edf7">Expected control vs. observed result</text>
+          <text x="496" y="287" font-size="10" fill="#fff">Evidence pack - owners - retest</text>
+          <g fill="none" stroke="#07847c" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#signal-arrow)">
+            <path d="M254 233 H280"/><path d="M365 253 V266"/>
+            <path d="M449 233 H483"/><path d="M449 286 H483"/>
+          </g>
+        </g>
+      </svg>
+      <figcaption>Reference design, not a deployed product. Logical placement is not a claim that managed services
+        share one VNet. Solid arrows: request paths; dashed arrows: signals. Direct model/tool paths must be
+        restricted or reported as uncovered. Support varies by agent type, gateway tier, and deployment. [1, 2]</figcaption>
+    </figure>
+    <footer><span>Foundry Defense Assurance | Proposed product; not a Microsoft offering</span><span>1 / 2</span></footer>
+  </section>
+
+  <section class="page" aria-label="Page 2: Campaign execution, reporting, and pilot">
+    <div class="eyebrow">From controlled attack to defensible evidence</div>
+    <h1 style="font-size:25pt">Show where the attack stopped.<br>Explain why the defense held.</h1>
+    <p class="flow">Define expectations &gt; simulate &gt; capture signals &gt; correlate outcomes &gt; report &gt; remediate &amp; retest</p>
+
+    <h2>One campaign, multiple enforcement points</h2>
+    <p>In a sandbox support-agent deployment, adversarial test content attempts to redirect the agent toward a
+      prohibited tool operation and a controlled external destination. Companion scenarios exercise unauthorized
+      ingress, configured content blocks, and deliberately small gateway quotas. Each scenario declares its
+      expected stop point, tested identity, route, configuration version, and observation window.</p>
+    <div class="columns">
+      <div class="card">
+        <h3>End-to-end chain</h3>
+        <p>Untrusted entry &gt; attempted redirection &gt; tool invocation &gt; permission or network boundary &gt;
+          simulated impact. Keep defenses intact. A blocked early stage is a valid result; later stages are
+          <strong>not exercised</strong>, not automatically passed.</p>
+      </div>
+      <div class="card">
+        <h3>Targeted boundary exercises</h3>
+        <p>Use separately labeled, authorized probes to reach downstream controls when the model refuses or an
+          earlier layer blocks. A controlled tool replay uses the representative identity and route; it proves
+          boundary behavior, not an end-to-end agent compromise.</p>
+      </div>
+    </div>
+
+    <h2>Signal capture is the product's evidence foundation</h2>
+    <p>Preflight diagnostics, trace coverage, permissions, and data arrival delays. Collect source event IDs,
+      request/trace identifiers, execution identity, configuration snapshots, and controlled backend outcomes.
+      Bind them to a simulator-issued run ID where supported; timestamp proximity alone does not prove causality.</p>
+    <p class="small">Foundry tracing supplies execution visibility [3]. Azure Activity Log records control-plane
+      changes, not every agent action; supported data-plane resource logs require separate diagnostics [6].
+      Sentinel supplies configured detection and incident evidence, not inline prevention [5]. Missing or
+      sampled telemetry creates an explicit evidence gap.</p>
+
+    <h2>Comprehensive reporting, without a misleading pass score</h2>
+    <table>
+      <thead><tr><th style="width:26%">Report view</th><th>What the customer receives</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Executive exposure</strong></td><td>Demonstrated impact, critical control gaps, coverage, and remediation priorities.</td></tr>
+        <tr><td><strong>Attack reconstruction</strong></td><td>Timeline from input to attempted action, actual enforcement point, and confirmed backend outcome.</td></tr>
+        <tr><td><strong>Five-control evidence</strong></td><td>Expected vs. observed result, identity/route, policy version, source records, and confidence limitations.</td></tr>
+        <tr><td><strong>Detection &amp; remediation</strong></td><td>Prevention and alert outcomes reported separately; owner, corrective action, and reproducible retest.</td></tr>
+      </tbody>
+    </table>
+    <p class="verdicts">VERDICTS: Passed for tested scope / Failed / Not exercised / Inconclusive / Not applicable</p>
+    <div class="example">
+      <strong>Illustrative finding: authorization held; detection needs attention.</strong>
+      <p>The agent attempted an unauthorized refund. The tool API denied the agent identity and the synthetic
+        ledger remained unchanged. Access control passed for this scenario. No expected Sentinel alert appeared
+        after the agreed window; investigate detection only after confirming telemetry completeness.
+        A model refusal alone would not establish this result.</p>
+    </div>
+
+    <div class="columns">
+      <div>
+        <h2 style="margin-top:3px">Focused first pilot</h2>
+        <p>One Foundry sandbox deployment, applicable APIM routes, scoped tool identity, controlled backend and
+          destination, and configured telemetry/Sentinel integration. Cover all five dimensions with paired
+          permitted/prohibited scenarios and rerun after remediation.</p>
+        <p><strong>Success measures:</strong> independent enforcement evidenced, uncovered routes identified,
+          detection outcomes established, and fixes confirmed without breaking permitted tasks.</p>
+      </div>
+      <div>
+        <h2 style="margin-top:3px">Safe and credible by design</h2>
+        <p>Explicit scope approval; synthetic data; test-only destinations; hard request, token, duration, and
+          concurrency caps; operator stop; read-only evidence collection where possible; sensitive-log
+          minimization and controlled retention. Never silently weaken defenses.</p>
+        <p class="small">Finite scenarios cannot guarantee universal safety, complete RAI coverage, or protection
+          from every cost overrun. Content-safety judgments are not necessarily deterministic. Full kill chain
+          means the defined scenario, not every possible attack. [4]</p>
+      </div>
+    </div>
+
+    <div class="sources">
+      <strong>Technical grounding:</strong> Microsoft documentation reviewed September 16, 2026.
+      The orchestration, evidence engine, report, and pilot above are proposed product capabilities.<br>
+      [1] <a href="https://learn.microsoft.com/en-us/azure/api-management/genai-gateway-capabilities">APIM AI gateway capabilities</a> &nbsp;
+      [2] <a href="https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/networking-options">Foundry networking options</a> &nbsp;
+      [3] <a href="https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/trace-agent-setup">Agent tracing</a><br>
+      [4] <a href="https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ai-agents/build-secure-process">Secure agent development</a> &nbsp;
+      [5] <a href="https://learn.microsoft.com/en-us/azure/sentinel/overview">Sentinel overview</a> &nbsp;
+      [6] <a href="https://learn.microsoft.com/en-us/azure/azure-monitor/platform/activity-log">Activity Log and resource logs</a>
+    </div>
+    <footer><span>Evidence-backed infrastructure assurance | Working pitch</span><span>2 / 2</span></footer>
+  </section>
+</body>
+</html>
