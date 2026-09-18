@@ -1,0 +1,1 @@
+"""Response fixture rendering."""
