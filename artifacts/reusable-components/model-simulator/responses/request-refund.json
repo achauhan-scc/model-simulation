@@ -1,0 +1,35 @@
+{
+  "id": "{requestId}",
+  "object": "chat.completion",
+  "created": "{created}",
+  "model": "{model}",
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "tool_calls",
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_refund_001",
+            "type": "function",
+            "function": {
+              "name": "issue_refund",
+              "arguments": "{\"customer_id\":\"C-1042\",\"amount\":10000,\"approval_token\":null}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 100,
+    "completion_tokens": 25,
+    "total_tokens": 125
+  },
+  "simulation": {
+    "campaign_run_id": "{campaignRunId}",
+    "usage_source": "synthetic"
+  }
+}

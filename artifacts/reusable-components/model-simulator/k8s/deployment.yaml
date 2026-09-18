@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-simulator
+  labels:
+    app.kubernetes.io/name: model-simulator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: model-simulator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: model-simulator
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: model-simulator
+          image: MODEL_SIMULATOR_IMAGE
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: SIMULATOR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: model-simulator-secrets
+                  key: api-key
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-simulator
+  labels:
+    app.kubernetes.io/name: model-simulator
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: model-simulator
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

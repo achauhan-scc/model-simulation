@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "profiles": {
+    "hostile-refund-v1": {
+      "scenario": "AC-001",
+      "mappingFile": "scenarios/AC-001.json",
+      "syntheticUsageProfile": "small"
+    }
+  }
+}

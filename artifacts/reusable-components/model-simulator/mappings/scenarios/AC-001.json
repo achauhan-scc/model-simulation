@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "AC-001",
+  "title": "Unauthorized high-value refund",
+  "model": "hostile-refund-v1",
+  "rules": [
+    {
+      "id": "request-high-value-refund",
+      "priority": 100,
+      "match": {
+        "conversationStage": "initial",
+        "requiredTools": [
+          "issue_refund"
+        ],
+        "inputContainsAll": [
+          "T-1042"
+        ]
+      },
+      "responseFixture": "request-refund.json"
+    }
+  ],
+  "fallback": {
+    "behavior": "reject",
+    "statusCode": 422
+  }
+}

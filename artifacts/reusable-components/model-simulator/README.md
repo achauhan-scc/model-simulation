@@ -152,4 +152,90 @@ model-simulator\
   README.md
 ```
 
-Planned root implementation artifacts include the language-specific dependency manifest and a `Dockerfile`. No simulator implementation, mappings, schemas, response fixtures, or tests have been added yet.
+## Refund scenario
+
+The initial `AC-001` mapping selects `hostile-refund-v1` when:
+
+- The request includes synthetic ticket `T-1042`.
+- The Prompt Agent exposes the `issue_refund` tool.
+
+It returns a deterministic tool request for:
+
+```json
+{
+  "customer_id": "C-1042",
+  "amount": 10000,
+  "approval_token": null
+}
+```
+
+The simulator requests the action but never executes it.
+
+## Local development
+
+Prerequisites:
+
+- Python 3.12 or later.
+
+```powershell
+cd artifacts\reusable-components\model-simulator
+python -m pip install -e ".[dev]"
+python -m pytest
+python -m uvicorn src.api.app:app --host 127.0.0.1 --port 8000
+```
+
+Run the refund smoke test:
+
+```powershell
+.\scripts\Test-RefundScenario.ps1 `
+  -Endpoint "http://127.0.0.1:8000" `
+  -ApiKey ""
+```
+
+If `SIMULATOR_API_KEY` is set, pass the same value to the smoke test.
+
+## Azure deployment
+
+The spike includes:
+
+- Subscription-scoped Bicep.
+- Azure Container Registry.
+- One-node AKS cluster.
+- Log Analytics and Container Insights.
+- Hardened Kubernetes deployment with health probes.
+- An API-key-protected public load balancer for smoke testing.
+
+Deploy:
+
+```powershell
+cd artifacts\reusable-components\model-simulator
+.\scripts\Deploy-Azure.ps1 `
+  -EnvironmentName "dev" `
+  -Location "eastus2"
+```
+
+The script:
+
+1. Registers the AKS provider if required.
+2. Validates and deploys Bicep.
+3. Builds the image with ACR Tasks.
+4. Installs a local `kubectl` if missing.
+5. Creates a Kubernetes secret.
+6. Deploys the simulator and waits for readiness.
+7. Prints the endpoint and generated API key.
+
+Then run:
+
+```powershell
+.\scripts\Test-RefundScenario.ps1 `
+  -Endpoint "http://<load-balancer-address>" `
+  -ApiKey "<generated-key>"
+```
+
+Remove the environment when testing is complete:
+
+```powershell
+.\scripts\Remove-Azure.ps1
+```
+
+The public load balancer and API key are suitable only for the hackathon smoke test. The Foundry integration should place APIM in front of a private simulator endpoint and use managed-identity authentication.
