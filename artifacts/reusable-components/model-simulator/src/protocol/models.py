@@ -37,6 +37,7 @@ class ChatCompletionRequest(BaseModel):
     tool_choice: str | dict[str, Any] | None = None
     temperature: float | None = None
     stream: bool = False
+    stream_options: dict[str, Any] | None = None
 
 
 class ErrorDetail(BaseModel):

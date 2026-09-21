@@ -1,13 +1,14 @@
+import json
 import os
 import time
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Iterator
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import ValidationError
 
 from src.matching.engine import match_request
@@ -140,23 +141,21 @@ async def get_scenario(model_alias: str) -> dict:
         ) from exc
 
 
-@app.post("/chat/completions", dependencies=[Depends(authorizer.authorize)])
-@app.post("/v1/chat/completions", dependencies=[Depends(authorizer.authorize)])
+@app.post(
+    "/chat/completions",
+    dependencies=[Depends(authorizer.authorize)],
+    response_model=None,
+)
+@app.post(
+    "/v1/chat/completions",
+    dependencies=[Depends(authorizer.authorize)],
+    response_model=None,
+)
 async def chat_completions(
     request: ChatCompletionRequest,
     raw_request: Request,
     campaign_run_id: Annotated[str | None, Header(alias="x-campaign-run-id")] = None,
-) -> dict:
-    if request.stream:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={
-                "message": "Streaming is not supported by this simulator version.",
-                "type": "invalid_request_error",
-                "code": "unsupported_streaming",
-            },
-        )
-
+) -> dict | StreamingResponse:
     try:
         scenario = store.scenario(request.model)
     except KeyError as exc:
@@ -215,10 +214,112 @@ async def chat_completions(
         availableTools=sorted(tool.function.name for tool in request.tools),
         emittedToolCalls=emitted_tools,
         usageSource="synthetic",
+        streaming=request.stream,
         requestHash=content_hash(request.model_dump(mode="json")),
         responseHash=content_hash(response),
     )
+    if request.stream:
+        include_usage = bool(
+            request.stream_options
+            and request.stream_options.get("include_usage") is True
+        )
+        return StreamingResponse(
+            _stream_chat_completion(response, include_usage),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "X-Accel-Buffering": "no",
+            },
+        )
     return response
+
+
+def _stream_chat_completion(
+    response: dict, include_usage: bool
+) -> Iterator[str]:
+    for chunk in _completion_chunks(response, include_usage):
+        yield f"data: {json.dumps(chunk, separators=(',', ':'))}\n\n"
+    yield "data: [DONE]\n\n"
+
+
+def _completion_chunks(response: dict, include_usage: bool) -> list[dict]:
+    chunks: list[dict] = []
+    base = {
+        "id": response["id"],
+        "object": "chat.completion.chunk",
+        "created": response["created"],
+        "model": response["model"],
+    }
+
+    for choice in response.get("choices", []):
+        index = choice.get("index", 0)
+        message = choice.get("message", {})
+        chunks.append(
+            {
+                **base,
+                "choices": [
+                    {
+                        "index": index,
+                        "delta": {"role": message.get("role", "assistant")},
+                        "finish_reason": None,
+                    }
+                ],
+            }
+        )
+
+        delta: dict = {}
+        content = message.get("content")
+        if isinstance(content, str):
+            delta["content"] = content
+
+        tool_calls = message.get("tool_calls")
+        if isinstance(tool_calls, list) and tool_calls:
+            delta["tool_calls"] = [
+                {
+                    "index": tool_index,
+                    "id": tool_call.get("id"),
+                    "type": tool_call.get("type", "function"),
+                    "function": tool_call.get("function", {}),
+                }
+                for tool_index, tool_call in enumerate(tool_calls)
+            ]
+
+        if delta:
+            chunks.append(
+                {
+                    **base,
+                    "choices": [
+                        {
+                            "index": index,
+                            "delta": delta,
+                            "finish_reason": None,
+                        }
+                    ],
+                }
+            )
+
+        chunks.append(
+            {
+                **base,
+                "choices": [
+                    {
+                        "index": index,
+                        "delta": {},
+                        "finish_reason": choice.get("finish_reason", "stop"),
+                    }
+                ],
+            }
+        )
+
+    if include_usage:
+        chunks.append(
+            {
+                **base,
+                "choices": [],
+                "usage": response.get("usage"),
+            }
+        )
+    return chunks
 
 
 def _emitted_tool_names(response: dict) -> list[str]:
