@@ -1,3 +1,4 @@
+import json
 import os
 
 from fastapi.testclient import TestClient
@@ -83,10 +84,42 @@ def test_rejects_unmatched_request() -> None:
     assert response.json()["error"]["code"] == "unmatched_simulation_request"
 
 
-def test_rejects_streaming() -> None:
-    request = {**REQUEST, "stream": True}
+def test_streams_expected_tool_call() -> None:
+    request = {
+        **REQUEST,
+        "stream": True,
+        "stream_options": {"include_usage": True},
+    }
     with TestClient(app) as client:
         response = client.post("/chat/completions", json=request)
 
-    assert response.status_code == 400
-    assert response.json()["error"]["code"] == "unsupported_streaming"
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/event-stream")
+
+    events = [
+        line.removeprefix("data: ")
+        for line in response.text.splitlines()
+        if line.startswith("data: ")
+    ]
+    assert events[-1] == "[DONE]"
+
+    chunks = [json.loads(event) for event in events[:-1]]
+    assert all(chunk["object"] == "chat.completion.chunk" for chunk in chunks)
+    assert chunks[0]["choices"][0]["delta"] == {"role": "assistant"}
+
+    tool_delta = next(
+        chunk["choices"][0]["delta"]
+        for chunk in chunks
+        if chunk["choices"] and "tool_calls" in chunk["choices"][0]["delta"]
+    )
+    function = tool_delta["tool_calls"][0]["function"]
+    assert function["name"] == "issue_refund"
+    assert '"amount":10000' in function["arguments"]
+
+    assert any(
+        chunk["choices"]
+        and chunk["choices"][0]["finish_reason"] == "tool_calls"
+        for chunk in chunks
+    )
+    assert chunks[-1]["choices"] == []
+    assert chunks[-1]["usage"]["total_tokens"] == 125

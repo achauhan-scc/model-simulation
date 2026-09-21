@@ -37,7 +37,7 @@ The initial implementation will support the subset required by the Prompt Agent:
 - Structured `tool_calls`
 - Tool-result messages in later turns
 - Clearly labelled synthetic `usage`
-- `stream` only if required by the selected Prompt Agent path
+- OpenAI-compatible server-sent event streaming for text and tool-call responses
 
 Operational endpoints:
 
